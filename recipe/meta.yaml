@@ -1,0 +1,44 @@
+{% set versions = {
+    "0.12.5": "f77cd44817299518e6d5034e46147bad70f8e09af2a76af4014a991b2703ebae",
+} %}
+
+
+{% set version = environ.get('COMMIT_VERSION', None) %}
+{% set version = version or versions.keys()|first %}
+{% set version = version|string %}
+
+package:
+  name: {{ environ.get('ANACONDA_PACKAGE', "yadism")|string|lower }}
+  version: {{ environ.get('ANACONDA_VERSION', version)|replace("-", ".") }}
+
+source:
+  url: "https://github.com/NNPDF/yadism/archive/refs/tags/v{{ version }}.tar.gz"
+  {% if versions.get(version, None) %}
+  sha256: {{ versions.get(version) }}
+  {% endif %}
+
+
+build:
+  noarch: python
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+
+requirements:
+  host:
+    - python<3.12,>=3.8
+    - poetry
+    - pip
+  run:
+    - python<3.12,>=3.8
+
+
+about:
+  home: "https://yadism.readthedocs.io"
+  license: "GPL-3.0"
+  summary: "Yet Another DIS Module"
+  description: |
+    Provide all necessary tools to compute the DIS structure functions and related objects. This project is linked closely to EKO.
+
+extra:
+  recipe-maintainers:
+    - meiyasan
